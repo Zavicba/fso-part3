@@ -24,8 +24,32 @@ const persons = [
     }
 ]
 
+function getDate() {
+    const options = {
+        weekday: 'short',
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric',
+        hour: 'numeric',
+        minute: 'numeric',
+        second: 'numeric',
+        timeZoneName: 'long',
+    }
+
+    return new Date().toLocaleString('en-US', options).replace(/,/g, '')
+}
+
 app.get('/api/persons', (req, res) => {
     res.json(persons)
+})
+
+app.get('/info', (req, res) => {
+    res.send(`
+        <div> 
+            <p>Phonebook has info for ${persons.length} people</p>
+            <p>${getDate()}</p>
+        </div>
+    `)
 })
 
 const PORT = 3001
