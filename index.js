@@ -1,6 +1,8 @@
 const express = require('express')
 const app = express()
 
+app.use(express.json())
+
 let persons = [
     {
         id: 1,
@@ -76,6 +78,23 @@ app.delete('/api/persons/:id', (req, res) => {
             error: `not found person with id: ${id}`
         })
     }
+})
+
+app.post('/api/persons', (req, res) => {
+    const newPerson = req.body
+
+    let isEmptyData = Object.entries(newPerson).length < 2
+
+    if (isEmptyData) {
+        return res.status(400).json({
+            error: 'empty data'
+        })
+    }
+
+    newPerson.id = Math.floor(Math.random() * 1000)
+    persons.push(newPerson)
+
+    res.send("person added successfully")
 })
 
 const PORT = 3001
