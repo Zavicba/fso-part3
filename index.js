@@ -41,6 +41,22 @@ function getDate() {
     return new Date().toLocaleString('en-US', options).replace(/,/g, '')
 }
 
+const checkBody = (body) => {
+    const keys = Object.keys(body)
+
+    if (!keys.includes("name") || !keys.includes("number")) {
+        return "one or more fields are missing"
+    }
+
+    const alreadyExist = persons.filter(person => body.name === person.name)
+
+    if (alreadyExist.length) {
+        return `There is already a person with the name ${body.name}`
+    }
+
+    return ""
+}
+
 app.get('/api/persons', (req, res) => {
     res.json(persons)
 })
@@ -82,12 +98,11 @@ app.delete('/api/persons/:id', (req, res) => {
 
 app.post('/api/persons', (req, res) => {
     const newPerson = req.body
+    const checkPerson = checkBody(newPerson)
 
-    let isEmptyData = Object.entries(newPerson).length < 2
-
-    if (isEmptyData) {
+    if (checkPerson !== "") {
         return res.status(400).json({
-            error: 'empty data'
+            error: checkPerson
         })
     }
 
