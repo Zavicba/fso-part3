@@ -124,7 +124,8 @@ app.post('/api/persons', (req, res) => {
     res.status(200).send(persons)
 })
 
-const PORT = 3001
+const PORT = process.env.PORT ?? 8443
+
 app.listen(PORT, () => {
     console.log(`Server running on port ${PORT}`)
 })
