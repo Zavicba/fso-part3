@@ -1,5 +1,6 @@
 const express = require('express')
 const morgan = require('morgan')
+const cors = require('cors')
 
 const app = express()
 
@@ -7,6 +8,8 @@ morgan.token('bodyTkn', function (req, res) { return JSON.stringify(req.body) })
 
 app.use(express.json())
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :bodyTkn'))
+app.use(cors())
+app.use(express.static('build'))
 
 let persons = [
     {
@@ -90,9 +93,11 @@ app.get('/api/persons/:id', (req, res) => {
 
 app.delete('/api/persons/:id', (req, res) => {
     const id = Number(req.params.id)
-    if (persons[id]) {
+    const existPerson = persons.find(person => person.id === id)
+
+    if (existPerson) {
         persons = persons.filter(person => person.id !== id)
-        console.log("persons", persons)
+        console.log("delete success")
         res.send({message: `person with id ${id} deleted successfully`})
     } else {
         res.status(400).json({
@@ -102,19 +107,21 @@ app.delete('/api/persons/:id', (req, res) => {
 })
 
 app.post('/api/persons', (req, res) => {
-    const newPerson = req.body
-    const checkPerson = checkBody(newPerson)
+    const checkPerson = checkBody(req.body)
 
     if (checkPerson !== "") {
         return res.status(400).json({
             error: checkPerson
         })
     }
+    const newPerson = {
+        id: Math.floor(Math.random() * 1000),
+        ...req.body
+    }
 
-    newPerson.id = Math.floor(Math.random() * 1000)
     persons.push(newPerson)
 
-    res.send("person added successfully")
+    res.status(200).send(persons)
 })
 
 const PORT = 3001
